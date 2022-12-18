@@ -14,7 +14,7 @@ def convert_records_to_domains(root_domain, records):
     buf = {}
 
     for record in records:
-        fqdn = f"{record[0]}.{root_domain}" if "@" != str(record[0]) else root_domain
+        fqdn = f"{record[0]}.{root_domain}" if str(record[0]) != "@" else root_domain
 
         if fqdn not in buf.keys():
             buf[fqdn] = {}
@@ -38,7 +38,7 @@ def convert_records_to_domains(root_domain, records):
             buf[fqdn]["NS"] = [str(x) for x in record_items]
             continue
 
-    for subdomain in buf.keys():
+    for subdomain in buf:
 
         def extract_records(desired_type):
             return [r.rstrip(".") for r in buf[subdomain][desired_type]]

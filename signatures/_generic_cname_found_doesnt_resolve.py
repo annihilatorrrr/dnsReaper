@@ -14,10 +14,7 @@ filtered_cname_substrings = [
 
 
 def cname_should_be_filtered(cname):
-    for f in filtered_cname_substrings:
-        if f in cname:
-            return True
-    return False
+    return any(f in cname for f in filtered_cname_substrings)
 
 
 def potential(domain: Domain, **kwargs) -> bool:

@@ -31,5 +31,5 @@ class cname_found_but_status_code(base.Base):
         self.code = code
         if code < 10:
             code = f"{code}XX"
-        info = info if info else INFO
+        info = info or INFO
         super().__init__(info.format(service=service, code=code), confidence)

@@ -40,7 +40,7 @@ class Output:
             self.write_json(finding)
 
     def write_csv(self, finding):
-        if self.writer == None:
+        if self.writer is None:
             self.writer = csv.DictWriter(
                 self.fd, fieldnames=finding.__dict__.keys(), dialect="excel"
             )
@@ -53,7 +53,7 @@ class Output:
 
     def write_json(self, finding):
         sep = ","
-        if self.writer == None:
+        if self.writer is None:
             self.fd.write("[")
             self.writer = True
             sep = ""  # no seperator for the first run

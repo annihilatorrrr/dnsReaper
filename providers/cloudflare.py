@@ -39,7 +39,7 @@ def convert_records_to_domains(records):
             buf[record["name"]][record["type"]] = []
         buf[record["name"]][record["type"]].append(record["content"])
 
-    for subdomain in buf.keys():
+    for subdomain in buf:
         domain = Domain(subdomain.rstrip("."), fetch_standard_records=False)
         if "A" in buf[subdomain].keys():
             domain.A = [r.rstrip(".") for r in buf[subdomain]["A"]]
@@ -73,10 +73,7 @@ def get_zones(client):
 
     logging.info(f"Got {len(zones)} zones ({total_pages} pages) from cloudflare")
 
-    if len(zones) == 0:
-        return []
-
-    return zones
+    return zones or []
 
 
 def fetch_domains(cloudflare_token, **args):
@@ -89,7 +86,6 @@ def fetch_domains(cloudflare_token, **args):
         logging.debug(
             f"Got {len(records)} records for cloudflare zone '{zone['name']}'"
         )
-        for record in convert_records_to_domains(records):
-            domains.append(record)
+        domains.extend(iter(convert_records_to_domains(records)))
     logging.warn(f"Got {len(domains)} records from cloudflare")
     return domains

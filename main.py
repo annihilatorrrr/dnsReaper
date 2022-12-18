@@ -32,7 +32,7 @@ args = argparsing.parse_args()
 
 if args.verbose == 0:
     verbosity_level = logging.WARN
-if args.verbose == 1:
+elif args.verbose == 1:
     verbosity_level = logging.INFO
 if args.verbose > 1:
     verbosity_level = logging.DEBUG
@@ -40,7 +40,7 @@ if args.verbose > 1:
 logging.basicConfig(format="%(message)s", level=verbosity_level)
 logging.StreamHandler(stderr)
 
-if not args.verbose > 2:
+if args.verbose <= 2:
     for module in ["boto", "requests"]:
         logger = logging.getLogger(module)
         logger.setLevel(logging.CRITICAL)
@@ -49,7 +49,7 @@ if not args.verbose > 2:
 provider = getattr(providers, args.provider)
 domains = list(provider.fetch_domains(**args.__dict__))
 
-if len(domains) == 0:
+if not domains:
     logging.error("ERROR: No domains to scan")
     exit(-1)
 
@@ -116,7 +116,7 @@ for finding in findings:
         msg = colorama.Fore.RED + msg + colorama.Fore.RESET
         logging.warning(msg)
 logging.warning(f"\n⏱️  We completed in {round(time.time() - start_time, 2)} seconds")
-logging.warning(f"...Thats all folks!")
+logging.warning("...Thats all folks!")
 if args.pipeline:
     logging.debug(f"Pipeline flag set - Exit code: {len(findings)}")
     exit(len(findings))

@@ -25,5 +25,5 @@ class cname_found_but_NX_DOMAIN(base.Base):
         confidence=CONFIDENCE.CONFIRMED,
     ):
         self.cname = cname
-        info = info if info else INFO
+        info = info or INFO
         super().__init__(info.format(service=service), confidence)

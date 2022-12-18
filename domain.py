@@ -24,10 +24,7 @@ class Domain:
     @lru_cache
     def NX_DOMAIN(self):
         record_types = ["A", "AAAA", "CNAME", "TXT", "MX", "NS"]
-        for record_type in record_types:
-            if self.query(record_type):
-                return False
-        return True
+        return not any(self.query(record_type) for record_type in record_types)
 
     def query(self, type):
         try:
@@ -61,7 +58,7 @@ class Domain:
         self.AAAA = []
         self.CNAME = []
         self.requests = requests
-        if ns == None:
+        if ns is None:
             self.resolver = dns.resolver
         else:
             self.set_custom_NS(ns)
@@ -88,12 +85,7 @@ class Domain:
             whois.whois(self.domain)
             return True
         except whois.parser.PywhoisError as e:
-            if e.args[0] == "No whois server is known for this kind of object.":
-                # This is the only case of a potentially registered domain
-                # triggering a PywhoisError
-                # https://github.com/richardpenman/whois/blob/56dc7e41d134e6d4343ad80a48533681bd887ff2/whois/parser.py#L201
-                return True
-            return False
+            return e.args[0] == "No whois server is known for this kind of object."
         except Exception:
             return True
 

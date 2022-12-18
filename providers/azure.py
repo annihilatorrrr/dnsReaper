@@ -55,7 +55,7 @@ def convert_records_to_domains(records):
         if record[2] == "NS":
             buf[record[1]][record[2]].append([x.nsdname for x in record[8]])
 
-    for subdomain in buf.keys():
+    for subdomain in buf:
         domain = Domain(subdomain.rstrip("."), fetch_standard_records=False)
         if "A" in buf[subdomain].keys():
             domain.A = [r.rstrip(".") for r in buf[subdomain]["A"][0]]
@@ -76,10 +76,7 @@ def get_zones(client):
 
     logging.debug(f"Got {len(zones)} zones from Azure")
 
-    if len(zones) == 0:
-        return []
-
-    return zones
+    return zones or []
 
 
 def fetch_domains(
@@ -94,6 +91,5 @@ def fetch_domains(
     for zone in zones:
         records = get_records(client, zone)
         logging.debug(f"Got {len(records)} records for Azure zone '{zone[0]}'")
-        for record in convert_records_to_domains(records):
-            domains.append(record)
+        domains.extend(iter(convert_records_to_domains(records)))
     return domains

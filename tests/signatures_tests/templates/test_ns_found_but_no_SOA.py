@@ -33,7 +33,7 @@ def test_check_success_ACTIVE(signature):
     except:
         ns = signature.test.ns
     ns = ns if type(ns) == list else [ns]
-    domain = Domain(f"mock.local", fetch_standard_records=False)
+    domain = Domain("mock.local", fetch_standard_records=False)
     for nameserver in ns:
         domain.NS = [nameserver]
         assert signature.test.check(domain) == True

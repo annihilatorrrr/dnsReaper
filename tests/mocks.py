@@ -63,9 +63,7 @@ class HostHeaderAdapter(requests.adapters.HTTPAdapter):
             return self.resolve_to_ip(ip)
 
     def wrap_if_ipv6(self, ip):
-        if ip.count(":") > 1:
-            return f"[{ip}]"
-        return ip
+        return f"[{ip}]" if ip.count(":") > 1 else ip
 
     def send(self, request, **kwargs):
         from urllib.parse import urlparse
@@ -81,10 +79,7 @@ class HostHeaderAdapter(requests.adapters.HTTPAdapter):
 
         resolved_ip = self.wrap_if_ipv6(resolved_ip)
 
-        request.url = request.url.replace(
-            "//" + result.hostname,
-            "//" + resolved_ip,
-        )
+        request.url = request.url.replace(f"//{result.hostname}", f"//{resolved_ip}")
         if "https" in request.url:
             connection_pool_kwargs["server_hostname"] = result.hostname  # SNI
             connection_pool_kwargs["assert_hostname"] = result.hostname

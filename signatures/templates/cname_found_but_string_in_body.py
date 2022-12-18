@@ -35,5 +35,5 @@ class cname_found_but_string_in_body(base.Base):
         self.cname = cname
         self.domain_not_configured_message = domain_not_configured_message
         self.https = https
-        info = info if info else INFO
+        info = info or INFO
         super().__init__(info.format(service=service), confidence)

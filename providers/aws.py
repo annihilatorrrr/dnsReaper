@@ -37,7 +37,7 @@ def convert_records_to_domains(records):
             ]
         elif "AliasTarget" in record:
             buf[record["Name"]][record["Type"]] = [record["AliasTarget"]["DNSName"]]
-    for subdomain in buf.keys():
+    for subdomain in buf:
         domain = Domain(subdomain.rstrip("."), fetch_standard_records=False)
         if "A" in buf[subdomain].keys():
             domain.A = [r.rstrip(".") for r in buf[subdomain]["A"]]
@@ -65,9 +65,7 @@ def get_zones(client):
         return []
     public_zones = [zone for zone in hosted_zones if not zone["Config"]["PrivateZone"]]
     logging.info(f"Got {len(hosted_zones)} public zones from aws")
-    if len(public_zones) == 0:
-        return []
-    return public_zones
+    return public_zones or []
 
 
 def validate_args(aws_access_key_id, aws_access_key_secret):
@@ -117,7 +115,6 @@ authentication methods
     for zone in zones:
         records = get_records(client, zone["Id"].replace("/hostedzone/", ""))
         logging.debug(f"Got {len(records)} records for aws zone '{zone['Name']}'")
-        for domain in convert_records_to_domains(records):
-            domains.append(domain)
+        domains.extend(iter(convert_records_to_domains(records)))
     logging.warning(f"Got {len(domains)} records from aws")
     return domains

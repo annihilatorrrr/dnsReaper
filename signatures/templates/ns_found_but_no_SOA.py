@@ -28,5 +28,5 @@ class ns_found_but_no_SOA(base.Base):
         self.ns = ns
         if sample_ns:
             self.sample_ns = sample_ns
-        info = info if info else INFO
+        info = info or INFO
         super().__init__(info.format(service=service), confidence)

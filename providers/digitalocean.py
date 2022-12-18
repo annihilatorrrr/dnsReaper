@@ -10,7 +10,7 @@ description = "Scan multiple domains by fetching them from Digital Ocean"
 
 class DomainNotFoundError(Exception):
     def __init__(self, domain):
-        self.message = "Domain not found: " + domain
+        self.message = f"Domain not found: {domain}"
         super().__init__(self.message)
 
 
@@ -18,7 +18,10 @@ class DoApi:
     def __init__(self, api_key):
         self.session = requests.session()
         self.session.headers.update(
-            {"Content-Type": "application/json", "Authorization": "Bearer " + api_key}
+            {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            }
         )
 
     @staticmethod
@@ -27,13 +30,13 @@ class DoApi:
             raise ValueError("Invalid API key specified.")
 
         if response.status_code < 200 or response.status_code >= 300:
-            raise ValueError("Invalid response received from API: " + response.json())
+            raise ValueError(f"Invalid response received from API: {response.json()}")
 
         return response
 
     def make_request(self, endpoint):
         return self.session.prepare_request(
-            requests.Request("GET", "https://api.digitalocean.com/v2/" + endpoint)
+            requests.Request("GET", f"https://api.digitalocean.com/v2/{endpoint}")
         )
 
     def list_domains(self):
@@ -45,7 +48,7 @@ class DoApi:
         req = self.make_request(f"domains/{domain}/records")
         res = self.session.send(req)
 
-        if 404 == res.status_code:
+        if res.status_code == 404:
             raise DomainNotFoundError(domain)
 
         return self.check_response(res)
@@ -54,7 +57,7 @@ class DoApi:
 def convert_records_to_domains(records, root_domain):
     buf = {}
     for record in records:
-        if "@" == record["name"]:
+        if record["name"] == "@":
             continue
 
         record_name = f"{record['name']}.{root_domain}"
@@ -71,7 +74,7 @@ def convert_records_to_domains(records, root_domain):
     def extract_records(desired_type):
         return [r.rstrip(".") for r in buf[subdomain][desired_type]]
 
-    for subdomain in buf.keys():
+    for subdomain in buf:
         domain = Domain(subdomain.rstrip("."), fetch_standard_records=False)
 
         if "A" in buf[subdomain].keys():
@@ -104,7 +107,7 @@ def fetch_domains(do_api_key: str, do_domains: str = None, **args):  # NOSONAR
         root_domains = [domain["name"] for domain in resp_data["domains"]]
 
     for domain in root_domains:
-        if "" == domain or domain is None:
+        if domain == "" or domain is None:
             continue
 
         records = api.get_records(domain).json()

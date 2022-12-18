@@ -3,16 +3,8 @@ from domain import Domain
 
 
 def matching_ipv4_or_ipv6(domain: Domain, ipv4, ipv6) -> bool:
-    if A.match(domain, ipv4):
-        return True
-    if AAAA.match(domain, ipv6):
-        return True
-    return False
+    return True if A.match(domain, ipv4) else bool(AAAA.match(domain, ipv6))
 
 
 def matching_ipv4_or_cname(domain: Domain, ipv4, strings) -> bool:
-    if A.match(domain, ipv4):
-        return True
-    if CNAME.match(domain, strings):
-        return True
-    return False
+    return True if A.match(domain, ipv4) else bool(CNAME.match(domain, strings))

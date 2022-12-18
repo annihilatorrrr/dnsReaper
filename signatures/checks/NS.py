@@ -4,8 +4,7 @@ import logging
 
 
 def match(domain: Domain, strings) -> str:
-    match = helpers.substrings_in_strings(strings, domain.NS)
-    if match:
+    if match := helpers.substrings_in_strings(strings, domain.NS):
         logging.debug(f"Match detected in NS '{match} for domain '{domain}'")
         return True
     return False
